@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/settingLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/topLayout"
+        android:layout_alignParentTop="true">
+
+        <Button
+            android:id="@+id/TimeSettingPageBackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="back" />
+
+        <Button
+            android:id="@+id/settingSaveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="save" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/settingDate"
+        android:padding="10dp"
+        android:text="Select a deadline"
+        android:layout_below="@+id/topLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/dateTextView"
+        android:padding="10dp"
+        android:text="There's no Deadline.. (Click above button)"
+        android:layout_below="@+id/settingDate"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center"/>
+
+    <LinearLayout
+        android:id="@+id/layout1"
+        android:orientation="horizontal"
+        android:layout_below="@+id/dateTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="interval" />
+
+            <NumberPicker
+                android:id="@+id/np1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="100dp"></NumberPicker>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+</RelativeLayout>

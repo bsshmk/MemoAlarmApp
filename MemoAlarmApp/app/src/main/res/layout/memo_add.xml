@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/memoAddLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="10dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/AddPagebackButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="back" />
+
+        <Button
+            android:id="@+id/btn1"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:text="다음" />
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/title"
+        android:hint="제목을 입력하세요."
+        android:layout_width="match_parent"
+        android:layout_height="80dp" />
+
+    <EditText
+        android:id="@+id/content"
+        android:hint="내용을 입력하세요."
+        android:gravity="top"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>
