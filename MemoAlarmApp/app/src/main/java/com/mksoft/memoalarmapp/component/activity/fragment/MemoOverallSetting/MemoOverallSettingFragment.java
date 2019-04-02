@@ -23,7 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import dagger.android.support.AndroidSupportInjection;
 
-public class MemoOverallSettingFragment extends Fragment {
+public class MemoOverallSettingFragment extends Fragment implements MainActivity.onKeyBackPressedListener{
     public MemoOverallSettingFragment(){
 
     }
@@ -109,18 +109,20 @@ public class MemoOverallSettingFragment extends Fragment {
 
         Toast.makeText(getContext(), "updated!", Toast.LENGTH_SHORT).show();
         memoReposityDB.insertOption(optionData);
-        mainActivity.OnFragmentChange(0,null);
+        onBackKey();
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         mainActivity = (MainActivity) getActivity();
+        ((MainActivity) context).setOnKeyBackPressedListener(this);
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
 
 //    public void changeFragment(int idx, ){
@@ -138,6 +140,11 @@ public class MemoOverallSettingFragment extends Fragment {
             }
         });
     }
-
+    @Override
+    public void onBackKey() {
+        mainActivity = (MainActivity) getActivity();
+        mainActivity.setOnKeyBackPressedListener(null);
+        mainActivity.onBackPressed();
+    }
 }
 

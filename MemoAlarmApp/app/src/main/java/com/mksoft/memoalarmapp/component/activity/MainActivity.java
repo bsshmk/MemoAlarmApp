@@ -16,6 +16,7 @@ import javax.inject.Inject;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import dagger.android.AndroidInjection;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
@@ -24,11 +25,10 @@ import dagger.android.support.HasSupportFragmentInjector;
 public class MainActivity extends AppCompatActivity  implements HasSupportFragmentInjector {
 
     MemoBodyFragment memoBodyFragment;
-    MemoAddFragment memoAddFragment;
-    MemoTimeSettingFragment memoTimeSettingFragment;//플레그먼트 주입이 될까?
     HideKeyboard hideKeyboard;
     public static MainActivity mainActivity;
-    MemoOverallSettingFragment memoOverallSettingFragment;
+
+    BackPressCloseHandler backPressCloseHandler;
 
     @Inject
     DispatchingAndroidInjector<Fragment> dispatchingAndroidInjector;
@@ -55,24 +55,9 @@ public class MainActivity extends AppCompatActivity  implements HasSupportFragme
     private void init(){
         hideKeyboard = new HideKeyboard(this);
         memoBodyFragment = new MemoBodyFragment();
-        memoAddFragment = new MemoAddFragment();
-        memoTimeSettingFragment = new MemoTimeSettingFragment();
-        memoOverallSettingFragment = new MemoOverallSettingFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, memoBodyFragment).commit();
     }
-    public void OnFragmentChange(int idx, Bundle bundle){
-        if(idx == 0){
-            getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, memoBodyFragment).commit();
-        }else if(idx == 1){
-            getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, memoAddFragment).commit();
-        }else if(idx == 2){
-            memoTimeSettingFragment.setArguments(bundle);
-            getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, memoTimeSettingFragment).commit();
 
-        }else if(idx == 3){
-            getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, memoOverallSettingFragment).commit();
-        }
-    }
 
     public void startAlarmService(){
         Intent intent = new Intent(this,AlarmService.class);
@@ -80,6 +65,30 @@ public class MainActivity extends AppCompatActivity  implements HasSupportFragme
     }
     public HideKeyboard getHideKeyboard(){
         return hideKeyboard;
+    }
+
+    ////////////////////// back key
+
+    public interface onKeyBackPressedListener{
+        void onBackKey();
+    }
+    private onKeyBackPressedListener mOnKeyBackPressedListener;
+    public void setOnKeyBackPressedListener(onKeyBackPressedListener listener){
+        mOnKeyBackPressedListener = listener;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mOnKeyBackPressedListener != null) {
+            mOnKeyBackPressedListener.onBackKey();
+        }else{
+            if(getSupportFragmentManager().getBackStackEntryCount() == 0){
+                backPressCloseHandler.onBackPressed();
+            }
+            else{
+                super.onBackPressed();
+            }
+        }
     }
 
 

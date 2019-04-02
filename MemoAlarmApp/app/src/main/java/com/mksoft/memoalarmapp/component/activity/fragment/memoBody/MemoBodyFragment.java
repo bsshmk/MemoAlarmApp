@@ -1,5 +1,6 @@
 package com.mksoft.memoalarmapp.component.activity.fragment.memoBody;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +19,8 @@ import com.mksoft.memoalarmapp.ViewModel.MemoViewModel;
 import com.mksoft.memoalarmapp.component.activity.MainActivity;
 import com.mksoft.memoalarmapp.R;
 import com.mksoft.memoalarmapp.DB.data.MemoData;
+import com.mksoft.memoalarmapp.component.activity.fragment.MemoOverallSetting.MemoOverallSettingFragment;
+import com.mksoft.memoalarmapp.component.activity.fragment.memoAdd.MemoAddFragment;
 
 import java.util.List;
 
@@ -26,6 +29,8 @@ import javax.inject.Inject;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -55,10 +60,16 @@ public class MemoBodyFragment extends Fragment {
     @Inject
     ViewModelProvider.Factory viewModelFactory;
 
+    FragmentTransaction fragmentTransaction;
     @Inject
     MemoReposityDB memoReposityDB;
 
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        ((MainActivity) context).setOnKeyBackPressedListener(null);
+    }
 
 
     @Override
@@ -73,6 +84,7 @@ public class MemoBodyFragment extends Fragment {
         super.onCreate(savedInstanceState);
         this.configureDagger();
         setHasOptionsMenu(true);
+
     }
 
     @Override
@@ -86,7 +98,12 @@ public class MemoBodyFragment extends Fragment {
         switch (item.getItemId()){
             case R.id.action_setting:
                 Toast.makeText(getContext(), "setting page", Toast.LENGTH_SHORT).show();
-                mainActivity.OnFragmentChange(3,null);
+//
+                fragmentTransaction = MainActivity.mainActivity.getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.mainContainer, new MemoOverallSettingFragment(),null);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+//                changeFragment(3);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -181,7 +198,11 @@ public class MemoBodyFragment extends Fragment {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mainActivity.OnFragmentChange(1,null);
+                fragmentTransaction = getFragmentManager().beginTransaction();
+                MainActivity.mainActivity.getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                fragmentTransaction.replace(R.id.mainContainer, new MemoAddFragment(), null);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         });
     }
