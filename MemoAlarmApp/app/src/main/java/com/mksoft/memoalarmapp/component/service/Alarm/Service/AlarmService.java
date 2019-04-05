@@ -42,6 +42,7 @@ public class AlarmService extends Service {
     //private ArrayList<String> tempRandomTime;
     SimpleDateFormat mFormat;
     String time;
+    NotificationCompat.Builder notificationFake = null;
 
     OptionData optionData;
 
@@ -83,16 +84,30 @@ public class AlarmService extends Service {
     //서비스가 종료될 때 할 작업
 
     public void onDestroy() {
-        //thread.stopForever();
+        thread.stopForever();
         thread = null;//쓰레기 값을 만들어서 빠르게 회수하라고 null을 넣어줌.
-        Intent its=new Intent(this, RestartService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            this.startForegroundService(its);
-        }
     }
+
     class myServiceHandler extends Handler {
 
+        private NotificationCompat.Builder makeFakeNotification(){
+            if(notificationFake != null)
+                return notificationFake;
+            String fakeCH = "-1";
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel(fakeCH, "-1", NotificationManager
+                .IMPORTANCE_DEFAULT);
+                ((NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE)).createNotificationChannel(channel);
+                notificationFake = new NotificationCompat.Builder(AlarmService.this, fakeCH);
+            }
+            notificationFake.setSmallIcon(R.drawable.ic_announcement_black_24dp)
+                    .setContentText("fake")
+                    .setContentTitle("fake");
 
+
+
+            return notificationFake;
+        }
         private boolean CheckComfort(int hour, int comfortA, int comfortB) {
             if (comfortA <= comfortB)
                 return comfortA <= hour && hour < comfortB;
@@ -134,6 +149,8 @@ public class AlarmService extends Service {
                         memoData.setRandomTime(memoData.getRandomTime().substring(0, memoData.getRandomTime().length()-10));
                     }//방해금지 설정이 되어있지 않음.
 
+                    memoReposityDB.insertMemo(memoData);
+                    //스트링 값을 갱신한 메모데이터를 insert하자.
 
                 }else{
                     Date current = null;
@@ -148,6 +165,9 @@ public class AlarmService extends Service {
                     if(compare>0){
                         memoData.setRandomTime(memoData.getRandomTime().substring(0, memoData.getRandomTime().length()-10));
                         //이미 지난 시간....
+                        memoReposityDB.insertMemo(memoData);
+                        //스트링 값을 갱신한 메모데이터를 insert하자.
+
                     }else{
                         Log.d("tempRT", "finePass");
                     }
@@ -165,9 +185,6 @@ public class AlarmService extends Service {
                     memoReposityDB.deleteMemo(memoData);
 
 
-                }else{
-                    memoReposityDB.insertMemo(memoData);
-                    //스트링 값을 갱신한 메모데이터를 insert하자.
                 }
             }
 
@@ -179,6 +196,10 @@ public class AlarmService extends Service {
             memoDataList = memoReposityDB.getStaticMemoDataList();
             optionData = memoReposityDB.getOptionData();
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                startForeground(-1, makeFakeNotification().build());
+                stopForeground(true);
+            }
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
 

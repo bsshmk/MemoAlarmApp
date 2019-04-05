@@ -35,4 +35,11 @@ public interface MemoDataDao {
     @Delete
     void delete(MemoData memoData);
 
+    @Query("SELECT * FROM memo_data_table ORDER BY regist_date")
+    LiveData<List<MemoData>> registDateSort();
+
+    @Query("SELECT * FROM memo_data_table ORDER BY end_date")
+    LiveData<List<MemoData>> endDateSort();
+
+
 }

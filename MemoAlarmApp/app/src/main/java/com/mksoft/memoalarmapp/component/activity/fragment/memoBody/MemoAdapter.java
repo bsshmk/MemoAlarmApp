@@ -36,6 +36,7 @@ public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     }
     List<MemoData> items =  Collections.emptyList();
     Context context;
+
     MyViewHolder myViewHolder;
     MemoSortFunction memoSortFunction;
 
@@ -95,4 +96,5 @@ public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     public MemoData getItem(int idx){
         return items.get(idx);
     }
+    public List<MemoData> getAllItem(){return items;}
 }//리스트뷰에 필요한 어뎁터를 만들어주는 공간이다.
