@@ -149,6 +149,8 @@ public class AlarmService extends Service {
                         memoData.setRandomTime(memoData.getRandomTime().substring(0, memoData.getRandomTime().length()-10));
                     }//방해금지 설정이 되어있지 않음.
 
+                    memoReposityDB.insertMemo(memoData);
+                    //스트링 값을 갱신한 메모데이터를 insert하자.
 
                 }else{
                     Date current = null;
@@ -163,6 +165,9 @@ public class AlarmService extends Service {
                     if(compare>0){
                         memoData.setRandomTime(memoData.getRandomTime().substring(0, memoData.getRandomTime().length()-10));
                         //이미 지난 시간....
+                        memoReposityDB.insertMemo(memoData);
+                        //스트링 값을 갱신한 메모데이터를 insert하자.
+
                     }else{
                         Log.d("tempRT", "finePass");
                     }
@@ -180,9 +185,6 @@ public class AlarmService extends Service {
                     memoReposityDB.deleteMemo(memoData);
 
 
-                }else{
-                    memoReposityDB.insertMemo(memoData);
-                    //스트링 값을 갱신한 메모데이터를 insert하자.
                 }
             }
 

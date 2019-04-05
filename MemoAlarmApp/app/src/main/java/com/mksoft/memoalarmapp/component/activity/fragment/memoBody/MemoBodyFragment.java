@@ -28,14 +28,22 @@ import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.InvalidationTracker;
 import dagger.android.support.AndroidSupportInjection;
 
 public class MemoBodyFragment extends Fragment {
@@ -65,10 +73,17 @@ public class MemoBodyFragment extends Fragment {
     MemoReposityDB memoReposityDB;
 
 
+    MemoSortFunction memoSortFunction;
+
+    int sortFlag = 0;//0 = 등록일, 1 = 마감일
+
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         ((MainActivity) context).setOnKeyBackPressedListener(null);
+
+
     }
 
 
@@ -116,7 +131,17 @@ public class MemoBodyFragment extends Fragment {
     private void configureViewModel(){
         memoViewModel = ViewModelProviders.of(this, viewModelFactory).get(MemoViewModel.class);
         memoViewModel.init();
-        memoViewModel.getMemoDataLiveData().observe(this, memoDataLiveData -> refreshDB(memoDataLiveData));
+
+        memoViewModel.getMemoDataLiveData().observe(this, memoDataLiveData -> {
+            if(sortFlag == 0){
+                memoSortFunction.registDateSort(memoDataLiveData);
+            }else if(sortFlag == 1){
+                memoSortFunction.endDateSort(memoDataLiveData);
+            }
+            refreshDB(memoDataLiveData);
+        });//라이브데이터를 바꾸거나 내부 저장된 디비의 배열을 변경하고 싶었지만... 잘 안됨...
+        //그래서 플래그 값을 주고 그에 맞추어서 옵저브가 변경을 인지할 때 마다 정렬을 해주는 식으로 구현
+
     }
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -143,7 +168,7 @@ public class MemoBodyFragment extends Fragment {
 
         }
 
-
+        memoSortFunction = new MemoSortFunction();
         mainActivity = (MainActivity) getActivity();
         recyclerView = (RecyclerView)rootView.findViewById(R.id.memoListRecyclerView);
         layoutManager = new LinearLayoutManager(rootView.getContext());
@@ -215,12 +240,13 @@ public class MemoBodyFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if(which == 0){
-                    memoAdapter.registDateSort();
 
+                    sortFlag = 0;
+                    memoAdapter.registDateSort();
                 }else{
 
+                    sortFlag = 1;
                     memoAdapter.endDateSort();
-
                 }//정렬을 외부에서 하고 다시 리사이크러뷰를 초기화해주는 병신같은 짓은 하지 말자.
 
             }
@@ -235,6 +261,7 @@ public class MemoBodyFragment extends Fragment {
     }
 
     public void refreshDB(@Nullable List<MemoData> memoDataList){
+
         memoAdapter.refreshItem(memoDataList);
 
     }

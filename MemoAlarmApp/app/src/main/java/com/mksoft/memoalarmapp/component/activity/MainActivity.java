@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity  implements HasSupportFragme
     private void init(){
         hideKeyboard = new HideKeyboard(this);
         memoBodyFragment = new MemoBodyFragment();
+        backPressCloseHandler = new BackPressCloseHandler(this);
         getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, memoBodyFragment).commit();
     }
 

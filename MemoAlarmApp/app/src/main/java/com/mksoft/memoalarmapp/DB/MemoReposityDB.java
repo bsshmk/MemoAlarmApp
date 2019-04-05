@@ -2,6 +2,7 @@ package com.mksoft.memoalarmapp.DB;
 
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 
 import com.mksoft.memoalarmapp.DB.data.MemoData;
@@ -20,6 +21,9 @@ public class MemoReposityDB {
     private MemoDataDao memoDataDao;
     private OptionDataDao optionDataDao;
     private LiveData<List<MemoData>> memoDataList;
+    private LiveData<List<MemoData>> registMemoData;
+    private LiveData<List<MemoData>> endMemoData;
+
     private List<MemoData> staticMemoDataList;
     private OptionData optionData;
 
@@ -28,10 +32,24 @@ public class MemoReposityDB {
         this.memoDataDao = memoDataDao;
         this.optionDataDao = optionDataDao;
         memoDataList = memoDataDao.getAll();
+        registMemoData = memoDataDao.registDateSort();
+        endMemoData = memoDataDao.endDateSort();
+
     }
     public LiveData<List<MemoData>> getMemoDataList(){
 
+
         return memoDataList;
+    }
+
+    public LiveData<List<MemoData>> getRegistMemoData(){
+
+        return registMemoData;
+    }
+
+    public LiveData<List<MemoData>> getEndMemoData(){
+
+        return endMemoData;
     }
     public List<MemoData> getStaticMemoDataList(){
         try {
