@@ -22,7 +22,6 @@ import dagger.android.AndroidInjection;
 import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 
-
 public class MainActivity extends AppCompatActivity  implements HasSupportFragmentInjector {
 
     MemoBodyFragment memoBodyFragment;
@@ -33,7 +32,6 @@ public class MainActivity extends AppCompatActivity  implements HasSupportFragme
 
     @Inject
     DispatchingAndroidInjector<Fragment> dispatchingAndroidInjector;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +50,12 @@ public class MainActivity extends AppCompatActivity  implements HasSupportFragme
         AndroidInjection.inject(this);
     }
 
-
     private void init(){
         hideKeyboard = new HideKeyboard(this);
         memoBodyFragment = new MemoBodyFragment();
+        backPressCloseHandler = new BackPressCloseHandler(this);
         getSupportFragmentManager().beginTransaction().replace(R.id.mainContainer, memoBodyFragment).commit();
     }
-
 
     public void startAlarmService(){
         //Intent intent = new Intent(this, AlarmService.class);
@@ -98,6 +95,4 @@ public class MainActivity extends AppCompatActivity  implements HasSupportFragme
             }
         }
     }
-
-
 }
