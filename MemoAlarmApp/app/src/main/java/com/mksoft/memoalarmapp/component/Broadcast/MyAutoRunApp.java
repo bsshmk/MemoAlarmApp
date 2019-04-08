@@ -8,6 +8,7 @@ import android.os.Build;
 import android.widget.Toast;
 
 import com.mksoft.memoalarmapp.component.service.Alarm.Service.AlarmService;
+import com.mksoft.memoalarmapp.component.service.Alarm.Service.RestartService;
 
 
 public class MyAutoRunApp extends BroadcastReceiver {
@@ -21,13 +22,14 @@ public class MyAutoRunApp extends BroadcastReceiver {
             context.startActivity(it);
             */
 
-            Intent its=new Intent(context,AlarmService.class);
-
             if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.O) {
+                Intent its=new Intent(context, RestartService.class);
                 context.startForegroundService(its);
             }
-            else
+            else {
+                Intent its=new Intent(context, AlarmService.class);
                 context.startService(its);
+            }
         }
     }
 }
