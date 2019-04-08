@@ -63,7 +63,6 @@ public class MemoBodyFragment extends Fragment {
 
     private MemoViewModel memoViewModel;
 
-
     ItemTouchHelper itemTouchHelper;
     @Inject
     ViewModelProvider.Factory viewModelFactory;
@@ -72,26 +71,20 @@ public class MemoBodyFragment extends Fragment {
     @Inject
     MemoReposityDB memoReposityDB;
 
-
     MemoSortFunction memoSortFunction;
 
     int sortFlag = 0;//0 = 등록일, 1 = 마감일
-
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         ((MainActivity) context).setOnKeyBackPressedListener(null);
-
-
     }
-
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         this.configureViewModel();
-
     }
 
     @Override
@@ -99,7 +92,6 @@ public class MemoBodyFragment extends Fragment {
         super.onCreate(savedInstanceState);
         this.configureDagger();
         setHasOptionsMenu(true);
-
     }
 
     @Override

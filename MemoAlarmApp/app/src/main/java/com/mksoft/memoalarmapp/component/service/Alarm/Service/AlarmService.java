@@ -3,7 +3,9 @@ package com.mksoft.memoalarmapp.component.service.Alarm.Service;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -18,6 +20,7 @@ import com.mksoft.memoalarmapp.DB.MemoReposityDB;
 import com.mksoft.memoalarmapp.DB.data.OptionData;
 import com.mksoft.memoalarmapp.R;
 import com.mksoft.memoalarmapp.DB.data.MemoData;
+import com.mksoft.memoalarmapp.component.activity.MainActivity;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,10 +42,12 @@ public class AlarmService extends Service {
     NotificationChannel notificationChannel;
 
     private List<MemoData> memoDataList;
-    //private MainActivity activity;
-    //private ArrayList<String> tempRandomTime;
     SimpleDateFormat mFormat;
     String time;
+
+    Intent intent;
+    TaskStackBuilder stackBuilder;
+    PendingIntent pendingIntent;
 
     OptionData optionData;
 
@@ -110,8 +115,6 @@ public class AlarmService extends Service {
                 Calendar calendar = Calendar.getInstance();
                 time=mFormat.format(calendar.getTime());
 
-
-
                 Log.d("tempRT", time);
                 if(tempRandomTime.equals(time))
                 {
@@ -149,29 +152,22 @@ public class AlarmService extends Service {
                     if(compare>0){
                         memoData.setRandomTime(memoData.getRandomTime().substring(0, memoData.getRandomTime().length()-10));
                         //이미 지난 시간....
-                    }else{
+                    }else {
                         Log.d("tempRT", "finePass");
                     }
-
-
                 }
                 //startForeground(-1,null);
                 //stopForeground(true);
 
                 if(memoData.getRandomTime().length() == 0){
-
                     //디비에서 지우기
-
                     Log.d("DBdel", "it");
                     memoReposityDB.deleteMemo(memoData);
-
-
                 }else{
                     memoReposityDB.insertMemo(memoData);
                     //스트링 값을 갱신한 메모데이터를 insert하자.
                 }
             }
-
         }
         @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
@@ -182,12 +178,18 @@ public class AlarmService extends Service {
 
             //Toast.makeText(getApplicationContext(),"제발",Toast.LENGTH_SHORT).show();
 
+            // 알림 클릭시 앱 열기
+            intent = new Intent(getApplicationContext(), MainActivity.class);
+            stackBuilder = TaskStackBuilder.create(AlarmService.this);
+            stackBuilder.addParentStack(MainActivity.class);
+            stackBuilder.addNextIntent(intent);
+
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-
-
 
                 for(int i =0; i<memoDataList.size(); i++){
                     MemoData memoData = memoDataList.get(i);
+
+                    pendingIntent = stackBuilder.getPendingIntent(memoData.getId(), PendingIntent.FLAG_UPDATE_CURRENT);
 
                     notificationChannel = new NotificationChannel(String.valueOf(memoData.getId()), "channel1", NotificationManager.IMPORTANCE_DEFAULT);
                     notificationChannel.setDescription("description");
@@ -204,26 +206,31 @@ public class AlarmService extends Service {
                             .setSmallIcon(R.drawable.ic_announcement_black_24dp)
                             .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.ic_event_black_24dp))
                             .setAutoCancel(true)
+                            .setContentIntent(pendingIntent)
                             .build();
 
-
                     checkNotify(memoData);
-
-
                 }
-
             }else{
+
+                // 알림 클릭시 앱 열기
+                intent = new Intent(getApplicationContext(), MainActivity.class);
+                stackBuilder = TaskStackBuilder.create(AlarmService.this);
+                stackBuilder.addParentStack(MainActivity.class);
+                stackBuilder.addNextIntent(intent);
 
                 for(int i =0; i<memoDataList.size(); i++){
                     MemoData memoData = memoDataList.get(i);
+
+                    pendingIntent = stackBuilder.getPendingIntent(memoData.getId(), PendingIntent.FLAG_UPDATE_CURRENT);
+
                     notification = new Notification.Builder(getApplicationContext())
                             .setContentTitle(memoData.getMemoTitle())
                             .setContentText(memoData.getMemoText())
                             .setTicker("알림!!!")
                             .setSmallIcon(R.drawable.ic_announcement_black_24dp)
+                            .setContentIntent(pendingIntent)
                             .build();
-
-
 
                     //알림 소리를 한번만 내도록
                     notification.flags = Notification.FLAG_ONLY_ALERT_ONCE;
