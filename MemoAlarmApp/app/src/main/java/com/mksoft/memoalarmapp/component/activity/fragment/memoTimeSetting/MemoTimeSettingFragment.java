@@ -208,9 +208,11 @@ public class MemoTimeSettingFragment extends Fragment implements MainActivity.on
                 Integer.parseInt(MD.getMinTime())*60));//수면 시작은 시간만
 
         // test time
-        //MD.setRandomTime(new RandomTimeMaker().Randomize(deadLine, time, 1));
+//        MD.setRandomTime(new RandomTimeMaker().Randomize(deadLine, time, 1));
 
-//         //년도가 너무 커지면 생성되는 랜덤사이즈가 너무 커진다.
+//        MD.setRandomTime("19040322001904032159");//수면 시작은 시간만
+
+           //년도가 너무 커지면 생성되는 랜덤사이즈가 너무 커진다.
         memoViewModel.insertMemoData(MD);
         fragmentTransaction = MainActivity.mainActivity.getSupportFragmentManager().beginTransaction();
         MainActivity.mainActivity.getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
