@@ -30,6 +30,8 @@ public class RandomTimeMaker {
         int limit_day = Integer.parseInt(deadline.substring(6,8));
         int interval;
 
+        int preHour;
+
         while (now_year <= limit_year) {
 
             interval = MakeInterval(min_interval);
@@ -38,8 +40,10 @@ public class RandomTimeMaker {
                 hour += min / 60;
                 min %= 60;
             }
-            if (hour >= 24) {
+            if(hour == 24){
                 now_day += hour / 24;
+            }//시간의 시작은 24시부터...
+            if (hour > 24) {
                 hour %= 24;
             }
             // 간격의 최대값(interval*2)이 31일을 넘지 않게 해야 함

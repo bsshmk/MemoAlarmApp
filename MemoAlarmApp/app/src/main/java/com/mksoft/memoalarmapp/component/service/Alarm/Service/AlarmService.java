@@ -33,13 +33,15 @@ import javax.inject.Inject;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import dagger.android.AndroidInjection;
 
 public class AlarmService extends Service {
+
     NotificationManager Notifi_M;
     AlarmServiceThread thread;
     Notification notification;
-    NotificationChannel notificationChannel;
+    Notification summary;
 
     private List<MemoData> memoDataList;
     SimpleDateFormat mFormat;
@@ -75,6 +77,30 @@ public class AlarmService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Notifi_M = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationChannel notificationChannel = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            notificationChannel = new NotificationChannel("MemoCHID", "channel_name", NotificationManager.IMPORTANCE_DEFAULT);
+            notificationChannel.setDescription("channel description");
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.GREEN);
+            notificationChannel.enableVibration(true);
+            notificationChannel.setVibrationPattern(new long[]{100, 200, 100, 200});
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+            Notifi_M.createNotificationChannel(notificationChannel);
+        }//오레오 버젼 이상부터는 채널 처리
+
+
+
+        summary = new NotificationCompat.Builder(getApplicationContext(), "MemoCHID")
+                .setContentTitle("MemoAlarm")
+                .setContentText("Check Memo")
+                .setSmallIcon(R.drawable.ic_announcement_black_24dp)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.ic_event_black_24dp))
+                .setAutoCancel(true)//다른 메모들이 다 취소되면 자동으로 취소
+                .setGroup("MemoGroup")
+                .setGroupSummary(true)//중요
+                .build();
+        //번들로 서머리에 메모 노티피케이션을 담자.
         mFormat=new SimpleDateFormat("yyMMddkkmm");//날짜 형식 지정
 
         myServiceHandler handler = new myServiceHandler();
@@ -122,12 +148,14 @@ public class AlarmService extends Service {
                         if (CheckComfort(Integer.parseInt(time.substring(6,8)),
                                 optionData.getSleepStartTime(), optionData.getSleepEndTime())){
                             Notifi_M.notify(memoData.getId(), notification);
+                            Notifi_M.notify(0, summary);
                             memoData.setRandomTime(memoData.getRandomTime().substring(0, memoData.getRandomTime().length()-10));
                             //방해금지 설정이 되어있고, 방해금지 설정 시간에 들어가면 노티파이를 소리없이 뛰어줌
                         }else{
                             notification.defaults = Notification.DEFAULT_SOUND;
                             Log.d("testHandler", "pass~");
                             Notifi_M.notify(memoData.getId(), notification);
+                            Notifi_M.notify(0, summary);
                             memoData.setRandomTime(memoData.getRandomTime().substring(0, memoData.getRandomTime().length()-10));
                         }//방해금지 설정이 되어있고, 방해금지 설정 시간에 들어가지 않는 경우
 
@@ -135,6 +163,7 @@ public class AlarmService extends Service {
                         notification.defaults = Notification.DEFAULT_SOUND;
                         Log.d("testHandler", "pass~");
                         Notifi_M.notify(memoData.getId(), notification);
+                        Notifi_M.notify(0, summary);
                         memoData.setRandomTime(memoData.getRandomTime().substring(0, memoData.getRandomTime().length()-10));
                     }//방해금지 설정이 되어있지 않음.
 
@@ -184,61 +213,31 @@ public class AlarmService extends Service {
             stackBuilder.addParentStack(MainActivity.class);
             stackBuilder.addNextIntent(intent);
 
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            for(int i =0; i<memoDataList.size(); i++){
+                MemoData memoData = memoDataList.get(i);
 
-                for(int i =0; i<memoDataList.size(); i++){
-                    MemoData memoData = memoDataList.get(i);
+                pendingIntent = stackBuilder.getPendingIntent(memoData.getId(), PendingIntent.FLAG_UPDATE_CURRENT);
 
-                    pendingIntent = stackBuilder.getPendingIntent(memoData.getId(), PendingIntent.FLAG_UPDATE_CURRENT);
+                notification = new NotificationCompat.Builder(getApplicationContext(), "MemoCHID")
+                        .setContentTitle(memoData.getMemoTitle())
+                        .setContentText(memoData.getMemoText())
+                        .setSmallIcon(R.drawable.ic_announcement_black_24dp)
+                        .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.ic_event_black_24dp))
+                        .setAutoCancel(true)//클릭시 자동삭제
+                        .setContentIntent(pendingIntent)//클릭시 app으로 이동
+                        .setGroup("MemoGroup")
+                        .build();
 
-                    notificationChannel = new NotificationChannel(String.valueOf(memoData.getId()), "channel1", NotificationManager.IMPORTANCE_DEFAULT);
-                    notificationChannel.setDescription("description");
-                    notificationChannel.enableLights(true);
-                    notificationChannel.setLightColor(Color.GREEN);
-                    notificationChannel.enableVibration(true);
-                    notificationChannel.setVibrationPattern(new long[]{100, 200, 100, 200});
-                    notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-                    Notifi_M.createNotificationChannel(notificationChannel);
-                    //인텐트에서 받은 메모 초기화 과정...
-                    notification = new Notification.Builder(getApplicationContext(), String.valueOf(memoData.getId()))
-                            .setContentTitle(memoData.getMemoTitle())
-                            .setContentText(memoData.getMemoText())
-                            .setSmallIcon(R.drawable.ic_announcement_black_24dp)
-                            .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.ic_event_black_24dp))
-                            .setAutoCancel(true)
-                            .setContentIntent(pendingIntent)
-                            .build();
 
-                    checkNotify(memoData);
-                }
-            }else{
 
-                // 알림 클릭시 앱 열기
-                intent = new Intent(getApplicationContext(), MainActivity.class);
-                stackBuilder = TaskStackBuilder.create(AlarmService.this);
-                stackBuilder.addParentStack(MainActivity.class);
-                stackBuilder.addNextIntent(intent);
+                checkNotify(memoData);
 
-                for(int i =0; i<memoDataList.size(); i++){
-                    MemoData memoData = memoDataList.get(i);
+                //알림 소리를 한번만 내도록
+                notification.flags = Notification.FLAG_ONLY_ALERT_ONCE;
 
-                    pendingIntent = stackBuilder.getPendingIntent(memoData.getId(), PendingIntent.FLAG_UPDATE_CURRENT);
+                //확인하면 자동으로 알림이 제거 되도록
+                notification.flags = Notification.FLAG_AUTO_CANCEL;
 
-                    notification = new Notification.Builder(getApplicationContext())
-                            .setContentTitle(memoData.getMemoTitle())
-                            .setContentText(memoData.getMemoText())
-                            .setTicker("알림!!!")
-                            .setSmallIcon(R.drawable.ic_announcement_black_24dp)
-                            .setContentIntent(pendingIntent)
-                            .build();
-
-                    //알림 소리를 한번만 내도록
-                    notification.flags = Notification.FLAG_ONLY_ALERT_ONCE;
-
-                    //확인하면 자동으로 알림이 제거 되도록
-                    notification.flags = Notification.FLAG_AUTO_CANCEL;
-                    checkNotify(memoData);
-                }
             }
 
         }
