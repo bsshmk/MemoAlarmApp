@@ -1,6 +1,7 @@
 package com.mksoft.memoalarmapp.component.activity.fragment.memoBody;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,17 +9,18 @@ import android.widget.TextView;
 
 import com.mksoft.memoalarmapp.R;
 import com.mksoft.memoalarmapp.DB.data.MemoData;
+import com.mksoft.memoalarmapp.component.activity.MainActivity;
+import com.mksoft.memoalarmapp.component.activity.fragment.memoItemViewFragment.MemoItemViewFragment;
 
 import java.util.Collections;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 
 public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
-
-
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView registDateTextView;
@@ -55,6 +57,9 @@ public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         return new MyViewHolder(v);
     }
 
+    Bundle bundle;
+    MemoItemViewFragment memoItemViewFragment;
+
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
         myViewHolder = (MyViewHolder) holder;
@@ -65,7 +70,21 @@ public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         myViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                bundle = new Bundle();
+                bundle.putString("title", items.get(position).getMemoTitle());
+                bundle.putString("content", items.get(position).getMemoText());
+                bundle.putString("regDate", items.get(position).getRegistDateTextView());
+                bundle.putString("endDate", items.get(position).getEndDateTextView());
 
+                memoItemViewFragment = new MemoItemViewFragment();
+                memoItemViewFragment.setArguments(bundle);
+
+                FragmentTransaction fragmentTransaction;
+
+                fragmentTransaction = MainActivity.mainActivity.getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.mainContainer, memoItemViewFragment,null);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
             }
         });
     }

@@ -4,6 +4,7 @@ package com.mksoft.memoalarmapp.DI;
 import com.mksoft.memoalarmapp.component.activity.fragment.MemoOverallSetting.MemoOverallSettingFragment;
 import com.mksoft.memoalarmapp.component.activity.fragment.memoAdd.MemoAddFragment;
 import com.mksoft.memoalarmapp.component.activity.fragment.memoBody.MemoBodyFragment;
+import com.mksoft.memoalarmapp.component.activity.fragment.memoItemViewFragment.MemoItemViewFragment;
 import com.mksoft.memoalarmapp.component.activity.fragment.memoTimeSetting.MemoTimeSettingFragment;
 
 import dagger.Module;
@@ -28,5 +29,6 @@ public abstract class FragmentModule {
     @ContributesAndroidInjector
     abstract MemoTimeSettingFragment contributeMemoTimeSettingFragment();
 
-
+    @ContributesAndroidInjector
+    abstract MemoItemViewFragment contributeMemoItemViewFragment();
 }
