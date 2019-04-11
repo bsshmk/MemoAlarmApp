@@ -4,7 +4,12 @@
 
     <item
         android:id="@+id/action_setting"
-        android:title="setting"
+        android:title="설정"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/sortButton"
+        android:title="정렬"
         app:showAsAction="never"/>
 
 </menu>

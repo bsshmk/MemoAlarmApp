@@ -25,7 +25,6 @@ android {
 
 dependencies {
 
-
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.0-alpha1'
     implementation 'com.google.android.material:material:1.0.0-alpha1'
@@ -43,9 +42,6 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version" // For Kotlin use kapt instead of annotationProcessor
 
-
-
-
     // DAGGER 2
     implementation 'com.google.dagger:dagger-android:2.17'
     implementation 'com.google.dagger:dagger-android-support:2.17'
@@ -62,6 +58,7 @@ dependencies {
 
     annotationProcessor "android.arch.lifecycle:compiler:1.1.1"
 
-
+    // ????????
+    implementation 'com.android.support:design:28.1.0'
 }
 
