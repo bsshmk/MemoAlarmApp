@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+//import android.support.design.widget.FloatingActionButton;
 import com.mksoft.memoalarmapp.DB.MemoReposityDB;
 import com.mksoft.memoalarmapp.DB.data.OptionData;
 import com.mksoft.memoalarmapp.ViewModel.MemoViewModel;
@@ -47,9 +49,7 @@ import androidx.room.InvalidationTracker;
 import dagger.android.support.AndroidSupportInjection;
 
 public class MemoBodyFragment extends Fragment {
-    public MemoBodyFragment(){
-
-    }
+    public MemoBodyFragment(){}
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
 
@@ -64,10 +64,13 @@ public class MemoBodyFragment extends Fragment {
     private MemoViewModel memoViewModel;
 
     ItemTouchHelper itemTouchHelper;
-    @Inject
-    ViewModelProvider.Factory viewModelFactory;
 
     FragmentTransaction fragmentTransaction;
+
+    FloatingActionButton fab;
+
+    @Inject
+    ViewModelProvider.Factory viewModelFactory;
     @Inject
     MemoReposityDB memoReposityDB;
 
@@ -110,8 +113,12 @@ public class MemoBodyFragment extends Fragment {
                 fragmentTransaction.replace(R.id.mainContainer, new MemoOverallSettingFragment(),null);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
-//                changeFragment(3);
                 return true;
+
+            case R.id.sortButton:
+                dialog.show();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -143,7 +150,7 @@ public class MemoBodyFragment extends Fragment {
 
         init(rootView);
 
-        clickSortButton();
+//        clickSortButton();
         clickAddButton();
 
         hideKeyboard();
@@ -157,27 +164,24 @@ public class MemoBodyFragment extends Fragment {
             optionData.setSleepStartTime(23);
             optionData.setSleepEndTime(9);
             memoReposityDB.insertOption(optionData);
-
         }
 
+        fab = (FloatingActionButton) rootView.findViewById(R.id.fab_main);
+
+        memoSortFunction = new MemoSortFunction();
         memoSortFunction = new MemoSortFunction();
         mainActivity = (MainActivity) getActivity();
         recyclerView = (RecyclerView)rootView.findViewById(R.id.memoListRecyclerView);
         layoutManager = new LinearLayoutManager(rootView.getContext());
 
-        addButton = (Button)rootView.findViewById(R.id.addButton);
-        sortButton = (Button)rootView.findViewById(R.id.sortButton);
-
+//        addButton = (Button)rootView.findViewById(R.id.addButton);
+//        sortButton = (Button)rootView.findViewById(R.id.sortButton);
 
         makeDialog(mainActivity);
         initListView();
-
     }
 
-
     private void initListView(){
-
-
 
             recyclerView.setHasFixedSize(true);
 
@@ -186,33 +190,23 @@ public class MemoBodyFragment extends Fragment {
             recyclerView.setLayoutManager(layoutManager);
             itemTouchHelper = new ItemTouchHelper(new ItemTouchHelperCallback(memoAdapter, memoReposityDB));
             itemTouchHelper.attachToRecyclerView(recyclerView);
-
     }
 
-
-
-
-
-
-
-    private void clickSortButton(){
-        if(sortButton == null)
-            return;
-        sortButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.show();
-
-            }
-        });
-    }
-
-
+//    private void clickSortButton(){
+//        if(sortButton == null)
+//            return;
+//        sortButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                dialog.show();
+//            }
+//        });
+//    }
 
     private void clickAddButton(){
-        if(addButton == null)
+        if(fab == null)
             return;
-        addButton.setOnClickListener(new View.OnClickListener() {
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 fragmentTransaction = getFragmentManager().beginTransaction();
@@ -224,7 +218,6 @@ public class MemoBodyFragment extends Fragment {
         });
     }
 
-
     private void makeDialog(MainActivity mainActivity){
         AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
         builder.setTitle("정렬 방법을 선택하세요.");
@@ -232,37 +225,22 @@ public class MemoBodyFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if(which == 0){
-
                     sortFlag = 0;
                     memoAdapter.registDateSort();
                 }else{
-
                     sortFlag = 1;
                     memoAdapter.endDateSort();
                 }//정렬을 외부에서 하고 다시 리사이크러뷰를 초기화해주는 병신같은 짓은 하지 말자.
-
             }
         });
         dialog = builder.create();    // 알림창 객체 생성
-
     }
-
 
     private void hideKeyboard(){
         MainActivity.mainActivity.getHideKeyboard().hideKeyboard();
     }
 
     public void refreshDB(@Nullable List<MemoData> memoDataList){
-
         memoAdapter.refreshItem(memoDataList);
-
     }
-
-
-
-
-
-
-
-
 }
