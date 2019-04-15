@@ -81,10 +81,16 @@ public class RandomTimeMaker {
             Log.d("timeString", str);
             timeList = str+timeList;
         }
+
+        String dday = new String();
+
+        dday += String.format("%02d", limit_year)  + String.format("%02d", limit_month)  + String.format("%02d", limit_day)
+                + "23"  + "59";
+
+        timeList = dday + timeList;
+
         return timeList;
     }
-
-
 
     private int MakeInterval(int min_interval) {
         double rand = Math.random();
