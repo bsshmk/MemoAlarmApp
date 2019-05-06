@@ -3,24 +3,21 @@ package com.mksoft.memoalarmapp.component.activity.fragment.memoBody;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-//import android.support.design.widget.FloatingActionButton;
 import com.mksoft.memoalarmapp.DB.MemoReposityDB;
+import com.mksoft.memoalarmapp.DB.data.MemoData;
 import com.mksoft.memoalarmapp.DB.data.OptionData;
+import com.mksoft.memoalarmapp.R;
 import com.mksoft.memoalarmapp.ViewModel.MemoViewModel;
 import com.mksoft.memoalarmapp.component.activity.MainActivity;
-import com.mksoft.memoalarmapp.R;
-import com.mksoft.memoalarmapp.DB.data.MemoData;
 import com.mksoft.memoalarmapp.component.activity.fragment.MemoOverallSetting.MemoOverallSettingFragment;
 import com.mksoft.memoalarmapp.component.activity.fragment.memoAdd.MemoAddFragment;
 
@@ -30,23 +27,17 @@ import javax.inject.Inject;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.Transformations;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.InvalidationTracker;
 import dagger.android.support.AndroidSupportInjection;
+
+//import android.support.design.widget.FloatingActionButton;
 
 public class MemoBodyFragment extends Fragment {
     public MemoBodyFragment(){}
@@ -54,12 +45,12 @@ public class MemoBodyFragment extends Fragment {
     RecyclerView.LayoutManager layoutManager;
 
     MemoAdapter memoAdapter;
-    Button sortButton;
-    Button addButton;
+    //Button sortButton;
+    //Button addButton;
 
     MainActivity mainActivity;
     AlertDialog dialog;
-    final CharSequence[] howWrite = {"등록일", "마감일"};
+    final CharSequence[] howWrite = {"등록일", "마감일", "제목"};
 
     private MemoViewModel memoViewModel;
 
@@ -76,7 +67,7 @@ public class MemoBodyFragment extends Fragment {
 
     MemoSortFunction memoSortFunction;
 
-    int sortFlag = 0;//0 = 등록일, 1 = 마감일
+    int sortFlag = 0;//0 = 등록일, 1 = 마감일, 2 = 제목
 
     @Override
     public void onAttach(Context context) {
@@ -136,6 +127,8 @@ public class MemoBodyFragment extends Fragment {
                 memoSortFunction.registDateSort(memoDataLiveData);
             }else if(sortFlag == 1){
                 memoSortFunction.endDateSort(memoDataLiveData);
+            }else if(sortFlag == 2){
+                memoSortFunction.titleSort(memoDataLiveData);
             }
             refreshDB(memoDataLiveData);
         });//라이브데이터를 바꾸거나 내부 저장된 디비의 배열을 변경하고 싶었지만... 잘 안됨...
@@ -227,10 +220,14 @@ public class MemoBodyFragment extends Fragment {
                 if(which == 0){
                     sortFlag = 0;
                     memoAdapter.registDateSort();
-                }else{
+                }else if(which == 1){
                     sortFlag = 1;
                     memoAdapter.endDateSort();
-                }//정렬을 외부에서 하고 다시 리사이크러뷰를 초기화해주는 병신같은 짓은 하지 말자.
+                }else{
+                    sortFlag = 2;
+                    memoAdapter.titleSort();
+                }
+                //정렬을 외부에서 하고 다시 리사이크러뷰를 초기화해주는 병신같은 짓은 하지 말자.
             }
         });
         dialog = builder.create();    // 알림창 객체 생성

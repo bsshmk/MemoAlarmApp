@@ -9,6 +9,15 @@ import java.util.List;
 public class MemoSortFunction {
     public MemoSortFunction() {
     }
+    public List<MemoData> titleSort(List<MemoData> inputData){
+        Collections.sort(inputData, new Comparator<MemoData>() {
+            @Override
+            public int compare(MemoData b1, MemoData b2) {
+                return b1.getMemoTitle().compareTo(b2.getMemoTitle());
+            }
+        });
+        return inputData;
+    }
     public List<MemoData> registDateSort(List<MemoData> inputData){
         Collections.sort(inputData, new Comparator<MemoData>() {
             @Override

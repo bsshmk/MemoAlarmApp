@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.mksoft.memoalarmapp.R;
 import com.mksoft.memoalarmapp.DB.data.MemoData;
+import com.mksoft.memoalarmapp.R;
 import com.mksoft.memoalarmapp.component.activity.MainActivity;
 import com.mksoft.memoalarmapp.component.activity.fragment.memoItemViewFragment.MemoItemViewFragment;
 
@@ -99,6 +99,10 @@ public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         notifyItemRemoved(position);
     }//밀어서 삭제 (스와이브 삭제 용)
 
+    public void titleSort(){
+        memoSortFunction.titleSort(items);
+        notifyItemRangeChanged(0,getItemCount());
+    }
     public void endDateSort(){
         memoSortFunction.endDateSort(items);
         notifyItemRangeChanged(0,getItemCount());
