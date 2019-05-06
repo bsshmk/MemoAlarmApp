@@ -2,6 +2,7 @@ package com.mksoft.memoalarmapp.component.activity.fragment.memoBody;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -54,7 +55,7 @@ public class MemoBodyFragment extends Fragment {
 
     private MemoViewModel memoViewModel;
 
-    ItemTouchHelper itemTouchHelper;
+    SwipeController swipeController;
 
     FragmentTransaction fragmentTransaction;
 
@@ -176,13 +177,27 @@ public class MemoBodyFragment extends Fragment {
 
     private void initListView(){
 
-            recyclerView.setHasFixedSize(true);
 
-            memoAdapter = new MemoAdapter(getContext());
-            recyclerView.setAdapter(memoAdapter);
-            recyclerView.setLayoutManager(layoutManager);
-            itemTouchHelper = new ItemTouchHelper(new ItemTouchHelperCallback(memoAdapter, memoReposityDB));
-            itemTouchHelper.attachToRecyclerView(recyclerView);
+        memoAdapter = new MemoAdapter(getContext());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(memoAdapter);
+        swipeController = new SwipeController(new SwipeControllerActions() {
+            @Override
+            public void onRightClicked(int position) {
+            memoReposityDB.deleteMemo(memoAdapter.getItem(position));
+
+            }
+        });
+
+        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
+        itemTouchhelper.attachToRecyclerView(recyclerView);
+
+        recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+                swipeController.onDraw(c);
+            }
+        });
     }
 
 //    private void clickSortButton(){
