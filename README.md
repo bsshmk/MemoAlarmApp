@@ -1,4 +1,4 @@
-# MemoAlarmApp(가제)
+# ALMO(ALarm meMO)
 
 
 
