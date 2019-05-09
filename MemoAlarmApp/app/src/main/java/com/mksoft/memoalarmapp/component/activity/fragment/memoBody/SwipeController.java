@@ -74,8 +74,10 @@ public class SwipeController extends ItemTouchHelper.Callback {
             swipeBack = buttonShowedState != ButtonsState.GONE;
             return 0;
         }
+        //return 0;
         return super.convertToAbsoluteDirection(flags, layoutDirection);
     }//방향 변경
+    //끝에 도달하면 swipeBack true
 
     @Override
     public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
@@ -83,15 +85,15 @@ public class SwipeController extends ItemTouchHelper.Callback {
             if (buttonShowedState != ButtonsState.GONE) {
                 if (buttonShowedState == ButtonsState.RIGHT_VISIBLE) dX = Math.min(dX, -buttonWidth);
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-            }
+            }//이게 없으면 끝에 도달을 못함 다시 자리로 돌아옴
             else {
                 setTouchListener(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-            }
+            }//이게 없으면 끝에 도달하는 View가 날라가버림 터치도 안먹음
         }
 
         if (buttonShowedState == ButtonsState.GONE) {
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-        }
+        }//긁을 때 중간 과정을 그려준다.
         currentItemViewHolder = viewHolder;
     }
 
@@ -101,13 +103,15 @@ public class SwipeController extends ItemTouchHelper.Callback {
             public boolean onTouch(View v, MotionEvent event) {
                 swipeBack = event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_UP;
                 if (swipeBack) {
-                    if (dX < -buttonWidth) buttonShowedState = ButtonsState.RIGHT_VISIBLE;
+                    if (dX < -buttonWidth) buttonShowedState = ButtonsState.RIGHT_VISIBLE;//이거 지우니 끝에 도달 못하고 다시 돌아옴
 
 
                     if (buttonShowedState != ButtonsState.GONE) {
-                        setTouchDownListener(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-                        setItemsClickable(recyclerView, false);
-                    }
+                        setTouchDownListener(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);//딜리트 버튼을 누를때 오버라이드한 함수가 호출 된다.
+                        //버튼에대한
+                        setItemsClickable(recyclerView, false);//이걸 지우면 딜리트 버튼이 만들어진 순간에 리사이클러뷰가 클릭이 된다.
+
+                    }//둘다 지우면 딜리트 버튼이 않눌림
                 }
                 return false;
             }
@@ -119,7 +123,7 @@ public class SwipeController extends ItemTouchHelper.Callback {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    setTouchUpListener(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                    setTouchUpListener(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);//이걸 호출해야 삭제 버튼이 눌러짐
                 }
                 return false;
             }
@@ -131,25 +135,28 @@ public class SwipeController extends ItemTouchHelper.Callback {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_UP) {
-                    SwipeController.super.onChildDraw(c, recyclerView, viewHolder, 0F, dY, actionState, isCurrentlyActive);
+                    SwipeController.super.onChildDraw(c, recyclerView, viewHolder, 0F, dY, actionState, isCurrentlyActive);//여기를 해야 card view 밖 또는 안을 클릭시
+                    //다시 복원
                     recyclerView.setOnTouchListener(new View.OnTouchListener() {
                         @Override
                         public boolean onTouch(View v, MotionEvent event) {
                             return false;
                         }
-                    });
-                    setItemsClickable(recyclerView, true);
+                    });//왜 있을까?
+                    setItemsClickable(recyclerView, true);//다시 클릭 가능하게
                     swipeBack = false;
 
                     if (buttonsActions != null && buttonInstance != null && buttonInstance.contains(event.getX(), event.getY())) {
                         if (buttonShowedState == ButtonsState.RIGHT_VISIBLE) {
-                            buttonsActions.onRightClicked(viewHolder.getAdapterPosition());
+                            buttonsActions.onRightClicked(viewHolder.getAdapterPosition());//보이는 부분 클릭시 오버라이드 함수 수행
                         }
                     }
                     buttonShowedState = ButtonsState.GONE;
                     currentItemViewHolder = null;
                 }
                 return false;
+
+                //다시 되될리기...
             }
         });
     }
