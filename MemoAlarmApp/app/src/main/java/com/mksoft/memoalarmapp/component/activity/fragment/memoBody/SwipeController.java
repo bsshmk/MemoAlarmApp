@@ -44,19 +44,24 @@ public class SwipeController extends ItemTouchHelper.Callback {
 
     private static final float buttonWidth = 300;
 
-    public SwipeController(SwipeControllerActions buttonsActions) {
+    private boolean tochState = false;// 이 친구를 통하여 미리 delete 버튼을 그려 놓는 것을 방지
+
+    public SwipeController(SwipeControllerActions buttonsActions, MemoAdapter memoAdapter) {
         this.buttonsActions = buttonsActions;
+        mAdapter = memoAdapter;
     }
 
     @Override
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-        return makeMovementFlags(0, LEFT);
+        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+        return makeMovementFlags(dragFlags, LEFT);
     }//오른쪽 가능하게 수정
 
 
     @Override
     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-        return false;
+        mAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+        return true;
     }
 
     @Override
@@ -101,6 +106,7 @@ public class SwipeController extends ItemTouchHelper.Callback {
         recyclerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                tochState = true;
                 swipeBack = event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_UP;
                 if (swipeBack) {
                     if (dX < -buttonWidth) buttonShowedState = ButtonsState.RIGHT_VISIBLE;//이거 지우니 끝에 도달 못하고 다시 돌아옴
@@ -154,6 +160,7 @@ public class SwipeController extends ItemTouchHelper.Callback {
                     buttonShowedState = ButtonsState.GONE;
                     currentItemViewHolder = null;
                 }
+                tochState = false;//돌아 올때 터치 상태도 돌리자
                 return false;
 
                 //다시 되될리기...
@@ -197,10 +204,23 @@ public class SwipeController extends ItemTouchHelper.Callback {
     }
 
     public void onDraw(Canvas c) {
-        if (currentItemViewHolder != null) {
+        if (currentItemViewHolder != null && tochState == true) {
             drawButtons(c, currentItemViewHolder);
         }
     }
+    @Override
+    public boolean isLongPressDragEnabled() {
+        return true;
+    }
+
+
+
+
+
+
+
+
+
 
 
 }

@@ -20,7 +20,11 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+
+
+
+public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements ItemTouchHelperAdapter {
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView registDateTextView;
@@ -120,4 +124,22 @@ public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         return items.get(idx);
     }
     public List<MemoData> getAllItem(){return items;}
+
+
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(items, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(items, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+        return;
+    }
+
+
 }//리스트뷰에 필요한 어뎁터를 만들어주는 공간이다.

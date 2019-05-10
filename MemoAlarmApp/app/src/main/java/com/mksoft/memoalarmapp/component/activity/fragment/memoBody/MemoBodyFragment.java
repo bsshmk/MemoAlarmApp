@@ -187,7 +187,7 @@ public class MemoBodyFragment extends Fragment {
             memoReposityDB.deleteMemo(memoAdapter.getItem(position));
 
             }
-        });
+        }, memoAdapter);
 
         ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
         itemTouchhelper.attachToRecyclerView(recyclerView);
@@ -195,6 +195,7 @@ public class MemoBodyFragment extends Fragment {
         recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+
                 swipeController.onDraw(c);
             }
         });
