@@ -145,9 +145,11 @@ public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             }
         }
         notifyItemMoved(fromPosition, toPosition);
-        memoBodyFragment.refreshID(items);
+        //
         return;
     }
 
-
+    public void refreshDB(){
+        memoBodyFragment.refreshID(items);
+    }
 }//리스트뷰에 필요한 어뎁터를 만들어주는 공간이다.

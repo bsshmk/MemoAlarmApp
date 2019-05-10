@@ -60,9 +60,15 @@ public class SwipeController extends ItemTouchHelper.Callback {
 
     @Override
     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+        if (viewHolder.getItemViewType() != target.getItemViewType()) {
+            mAdapter.refreshDB();
+            return false;
+        }//한칸만 올라가는 현상 수정
+
         mAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
         return true;
     }
+
 
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
