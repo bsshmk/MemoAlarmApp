@@ -192,7 +192,7 @@ public class AlarmService extends Service {
                 //startForeground(-1,null);
                 //stopForeground(true);
 
-                if(memoData.getRandomTime().length() == 0){
+                if(memoData.getRandomTime().length() == 0) {
                     //디비에서 지우기
                     Log.d("DBdel", "it");
                     memoReposityDB.deleteMemo(memoData);

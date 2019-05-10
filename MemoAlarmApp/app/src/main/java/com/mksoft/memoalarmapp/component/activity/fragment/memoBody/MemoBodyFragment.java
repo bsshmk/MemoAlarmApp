@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,6 +23,7 @@ import com.mksoft.memoalarmapp.component.activity.MainActivity;
 import com.mksoft.memoalarmapp.component.activity.fragment.MemoOverallSetting.MemoOverallSettingFragment;
 import com.mksoft.memoalarmapp.component.activity.fragment.memoAdd.MemoAddFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -44,7 +46,7 @@ public class MemoBodyFragment extends Fragment {
     public MemoBodyFragment(){}
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
-
+    MemoBodyFragment memoBodyFragment;
     MemoAdapter memoAdapter;
     //Button sortButton;
     //Button addButton;
@@ -67,7 +69,7 @@ public class MemoBodyFragment extends Fragment {
     MemoReposityDB memoReposityDB;
 
     MemoSortFunction memoSortFunction;
-
+    List<Integer> customSortArr;
     int sortFlag = 0;//0 = 등록일, 1 = 마감일, 2 = 제목
 
     @Override
@@ -153,6 +155,7 @@ public class MemoBodyFragment extends Fragment {
     }
 
     private void init(ViewGroup rootView){
+        memoBodyFragment = this;
         if(memoReposityDB.getOptionData() == null){
             OptionData optionData = new OptionData();
             optionData.setSleepStartTime(23);
@@ -178,7 +181,7 @@ public class MemoBodyFragment extends Fragment {
     private void initListView(){
 
 
-        memoAdapter = new MemoAdapter(getContext());
+        memoAdapter = new MemoAdapter(getContext(), memoBodyFragment);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(memoAdapter);
         swipeController = new SwipeController(new SwipeControllerActions() {
@@ -255,5 +258,8 @@ public class MemoBodyFragment extends Fragment {
 
     public void refreshDB(@Nullable List<MemoData> memoDataList){
         memoAdapter.refreshItem(memoDataList);
+    }
+    public void refreshID(@Nullable List<MemoData> memoDataList){
+        memoReposityDB.insertMemoList(memoDataList);
     }
 }

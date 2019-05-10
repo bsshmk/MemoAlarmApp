@@ -12,6 +12,7 @@ import com.mksoft.memoalarmapp.R;
 import com.mksoft.memoalarmapp.component.activity.MainActivity;
 import com.mksoft.memoalarmapp.component.activity.fragment.memoItemViewFragment.MemoItemViewFragment;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,11 +46,11 @@ public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     MyViewHolder myViewHolder;
     MemoSortFunction memoSortFunction;
-
-    public MemoAdapter(Context context){
+    MemoBodyFragment memoBodyFragment;
+    public MemoAdapter(Context context, MemoBodyFragment memoBodyFragment){
         this.context = context;
         this.memoSortFunction = new MemoSortFunction();
-
+        this.memoBodyFragment = memoBodyFragment;
     }
 
 
@@ -130,14 +131,21 @@ public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void onItemMove(int fromPosition, int toPosition) {
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
+                int tempID = items.get(i).getId();
+                items.get(i).setId(items.get(i+1).getId());
+                items.get(i+1).setId(tempID);
                 Collections.swap(items, i, i + 1);
             }
         } else {
             for (int i = fromPosition; i > toPosition; i--) {
+                int tempID = items.get(i).getId();
+                items.get(i).setId(items.get(i-1).getId());
+                items.get(i-1).setId(tempID);
                 Collections.swap(items, i, i - 1);
             }
         }
         notifyItemMoved(fromPosition, toPosition);
+        memoBodyFragment.refreshID(items);
         return;
     }
 
