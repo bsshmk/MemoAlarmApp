@@ -2,7 +2,9 @@ package com.mksoft.memoalarmapp.component.activity.fragment.memoBody;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Canvas;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +23,7 @@ import com.mksoft.memoalarmapp.component.activity.MainActivity;
 import com.mksoft.memoalarmapp.component.activity.fragment.MemoOverallSetting.MemoOverallSettingFragment;
 import com.mksoft.memoalarmapp.component.activity.fragment.memoAdd.MemoAddFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -43,7 +46,7 @@ public class MemoBodyFragment extends Fragment {
     public MemoBodyFragment(){}
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
-
+    MemoBodyFragment memoBodyFragment;
     MemoAdapter memoAdapter;
     //Button sortButton;
     //Button addButton;
@@ -54,7 +57,7 @@ public class MemoBodyFragment extends Fragment {
 
     private MemoViewModel memoViewModel;
 
-    ItemTouchHelper itemTouchHelper;
+    SwipeController swipeController;
 
     FragmentTransaction fragmentTransaction;
 
@@ -66,7 +69,7 @@ public class MemoBodyFragment extends Fragment {
     MemoReposityDB memoReposityDB;
 
     MemoSortFunction memoSortFunction;
-
+    List<Integer> customSortArr;
     int sortFlag = 0;//0 = 등록일, 1 = 마감일, 2 = 제목
 
     @Override
@@ -152,6 +155,7 @@ public class MemoBodyFragment extends Fragment {
     }
 
     private void init(ViewGroup rootView){
+        memoBodyFragment = this;
         if(memoReposityDB.getOptionData() == null){
             OptionData optionData = new OptionData();
             optionData.setSleepStartTime(23);
@@ -176,13 +180,28 @@ public class MemoBodyFragment extends Fragment {
 
     private void initListView(){
 
-            recyclerView.setHasFixedSize(true);
 
-            memoAdapter = new MemoAdapter(getContext());
-            recyclerView.setAdapter(memoAdapter);
-            recyclerView.setLayoutManager(layoutManager);
-            itemTouchHelper = new ItemTouchHelper(new ItemTouchHelperCallback(memoAdapter, memoReposityDB));
-            itemTouchHelper.attachToRecyclerView(recyclerView);
+        memoAdapter = new MemoAdapter(getContext(), memoBodyFragment);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(memoAdapter);
+        swipeController = new SwipeController(new SwipeControllerActions() {
+            @Override
+            public void onRightClicked(int position) {
+            memoReposityDB.deleteMemo(memoAdapter.getItem(position));
+
+            }
+        }, memoAdapter);
+
+        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeController);
+        itemTouchhelper.attachToRecyclerView(recyclerView);
+
+        recyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
+
+                swipeController.onDraw(c);
+            }
+        });
     }
 
 //    private void clickSortButton(){
@@ -227,7 +246,6 @@ public class MemoBodyFragment extends Fragment {
                     sortFlag = 2;
                     memoAdapter.titleSort();
                 }
-                //정렬을 외부에서 하고 다시 리사이크러뷰를 초기화해주는 병신같은 짓은 하지 말자.
             }
         });
         dialog = builder.create();    // 알림창 객체 생성
@@ -239,5 +257,8 @@ public class MemoBodyFragment extends Fragment {
 
     public void refreshDB(@Nullable List<MemoData> memoDataList){
         memoAdapter.refreshItem(memoDataList);
+    }
+    public void refreshID(@Nullable List<MemoData> memoDataList){
+        memoReposityDB.insertMemoList(memoDataList);
     }
 }

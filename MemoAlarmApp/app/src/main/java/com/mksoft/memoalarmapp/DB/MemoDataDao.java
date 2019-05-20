@@ -29,6 +29,11 @@ public interface MemoDataDao {
     @Insert(onConflict = REPLACE)
     void insertMemo(MemoData memoData);
 
+    @Insert(onConflict = REPLACE)
+    void insertMemoList(List<MemoData> memoData);
+
+
+
     @Query("DELETE from memo_data_table")
     void deleteAll();
 

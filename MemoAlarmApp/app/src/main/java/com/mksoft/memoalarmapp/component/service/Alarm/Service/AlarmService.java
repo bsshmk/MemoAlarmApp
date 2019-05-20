@@ -150,6 +150,7 @@ public class AlarmService extends Service {
                             Notifi_M.notify(memoData.getId(), notification);
                             Notifi_M.notify(0, summary);
                             memoData.setRandomTime(memoData.getRandomTime().substring(0, memoData.getRandomTime().length()-10));
+                            memoReposityDB.insertMemo(memoData);
                             //방해금지 설정이 되어있고, 방해금지 설정 시간에 들어가면 노티파이를 소리없이 뛰어줌
                         }else{
                             notification.defaults = Notification.DEFAULT_SOUND;
@@ -157,6 +158,7 @@ public class AlarmService extends Service {
                             Notifi_M.notify(memoData.getId(), notification);
                             Notifi_M.notify(0, summary);
                             memoData.setRandomTime(memoData.getRandomTime().substring(0, memoData.getRandomTime().length()-10));
+                            memoReposityDB.insertMemo(memoData);
                         }//방해금지 설정이 되어있고, 방해금지 설정 시간에 들어가지 않는 경우
 
                     }else{
@@ -165,6 +167,7 @@ public class AlarmService extends Service {
                         Notifi_M.notify(memoData.getId(), notification);
                         Notifi_M.notify(0, summary);
                         memoData.setRandomTime(memoData.getRandomTime().substring(0, memoData.getRandomTime().length()-10));
+                        memoReposityDB.insertMemo(memoData);
                     }//방해금지 설정이 되어있지 않음.
 
 
@@ -180,6 +183,7 @@ public class AlarmService extends Service {
                     int compare = current.compareTo(RT);
                     if(compare>0){
                         memoData.setRandomTime(memoData.getRandomTime().substring(0, memoData.getRandomTime().length()-10));
+                        memoReposityDB.insertMemo(memoData);
                         //이미 지난 시간....
                     }else {
                         Log.d("tempRT", "finePass");
@@ -188,13 +192,10 @@ public class AlarmService extends Service {
                 //startForeground(-1,null);
                 //stopForeground(true);
 
-                if(memoData.getRandomTime().length() == 0){
+                if(memoData.getRandomTime().length() == 0) {
                     //디비에서 지우기
                     Log.d("DBdel", "it");
                     memoReposityDB.deleteMemo(memoData);
-                }else{
-                    memoReposityDB.insertMemo(memoData);
-                    //스트링 값을 갱신한 메모데이터를 insert하자.
                 }
             }
         }

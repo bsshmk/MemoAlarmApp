@@ -12,6 +12,7 @@ import com.mksoft.memoalarmapp.R;
 import com.mksoft.memoalarmapp.component.activity.MainActivity;
 import com.mksoft.memoalarmapp.component.activity.fragment.memoItemViewFragment.MemoItemViewFragment;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,7 +21,11 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
+
+
+
+public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements ItemTouchHelperAdapter {
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView registDateTextView;
@@ -41,11 +46,11 @@ public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     MyViewHolder myViewHolder;
     MemoSortFunction memoSortFunction;
-
-    public MemoAdapter(Context context){
+    MemoBodyFragment memoBodyFragment;
+    public MemoAdapter(Context context, MemoBodyFragment memoBodyFragment){
         this.context = context;
         this.memoSortFunction = new MemoSortFunction();
-
+        this.memoBodyFragment = memoBodyFragment;
     }
 
 
@@ -120,4 +125,31 @@ public class MemoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
         return items.get(idx);
     }
     public List<MemoData> getAllItem(){return items;}
+
+
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                int tempID = items.get(i).getId();
+                items.get(i).setId(items.get(i+1).getId());
+                items.get(i+1).setId(tempID);
+                Collections.swap(items, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                int tempID = items.get(i).getId();
+                items.get(i).setId(items.get(i-1).getId());
+                items.get(i-1).setId(tempID);
+                Collections.swap(items, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+        //
+        return;
+    }
+
+    public void refreshDB(){
+        memoBodyFragment.refreshID(items);
+    }
 }//리스트뷰에 필요한 어뎁터를 만들어주는 공간이다.
