@@ -83,9 +83,7 @@ public class MemoReposityDB {
     public void insertMemo(MemoData memoData){
         new insertAsyncTask(memoDataDao).execute(memoData);
     }
-    public void insertMemoList(List<MemoData> memoData){
-        new insertListAsyncTask(memoDataDao).execute(memoData);
-    }
+
     public void deleteMemo(MemoData memoData){
         new deleteAsyncTask(memoDataDao).execute(memoData);
     }
@@ -111,18 +109,6 @@ public class MemoReposityDB {
         @Override
         protected Void doInBackground(MemoData... memoData) {
             asyncUserDao.insertMemo(memoData[0]);
-            return null;
-        }
-    }
-    private static class insertListAsyncTask extends AsyncTask<List<MemoData>, Void, Void>{
-        private MemoDataDao asyncUserDao;
-        insertListAsyncTask(MemoDataDao dao){
-            asyncUserDao = dao;
-        }
-
-        @Override
-        protected Void doInBackground(List<MemoData>... memoData) {
-            asyncUserDao.insertMemoList(memoData[0]);
             return null;
         }
     }
