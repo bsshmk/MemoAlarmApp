@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -12,6 +13,8 @@ import com.mksoft.memoalarmapp.DB.MemoReposityDB;
 import com.mksoft.memoalarmapp.DB.data.MemoData;
 import com.mksoft.memoalarmapp.ViewModel.MemoViewModel;
 import com.mksoft.memoalarmapp.component.activity.MainActivity;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -33,6 +36,7 @@ public class SwipeController extends ItemTouchHelper.Callback {
     private MemoReposityDB memoReposityDB;
 
     private boolean swipeBack = false;
+
 
     private ButtonsState buttonShowedState = ButtonsState.GONE;
 
@@ -61,6 +65,8 @@ public class SwipeController extends ItemTouchHelper.Callback {
     @Override
     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
         if (viewHolder.getItemViewType() != target.getItemViewType()) {
+
+
             mAdapter.refreshDB();
             return false;
         }//한칸만 올라가는 현상 수정
@@ -81,6 +87,7 @@ public class SwipeController extends ItemTouchHelper.Callback {
 
     @Override
     public int convertToAbsoluteDirection(int flags, int layoutDirection) {
+        //로그테스트 필요
         if (swipeBack) {
             swipeBack = buttonShowedState != ButtonsState.GONE;
             return 0;
@@ -166,6 +173,8 @@ public class SwipeController extends ItemTouchHelper.Callback {
                     buttonShowedState = ButtonsState.GONE;
                     currentItemViewHolder = null;
                 }
+                buttonInstance = null;//복원 과정에서 버튼을 널로 초기화
+                //하지 않으면 찌꺼기가 남아있다.
                 tochState = false;//돌아 올때 터치 상태도 돌리자
                 return false;
 
@@ -214,18 +223,11 @@ public class SwipeController extends ItemTouchHelper.Callback {
             drawButtons(c, currentItemViewHolder);
         }
     }
+
     @Override
     public boolean isLongPressDragEnabled() {
         return true;
     }
-
-
-
-
-
-
-
-
 
 
 

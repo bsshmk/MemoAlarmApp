@@ -246,7 +246,6 @@ public class MemoBodyFragment extends Fragment {
                     sortFlag = 2;
                     memoAdapter.titleSort();
                 }
-                //정렬을 외부에서 하고 다시 리사이크러뷰를 초기화해주는 병신같은 짓은 하지 말자.
             }
         });
         dialog = builder.create();    // 알림창 객체 생성
