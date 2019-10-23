@@ -2,6 +2,7 @@ package com.mksoft.memoalarmapp.component.activity.fragment.memoTimeSetting;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,25 +39,19 @@ import dagger.android.support.AndroidSupportInjection;
 public class MemoTimeSettingFragment extends Fragment implements MainActivity.onKeyBackPressedListener{
 
     MemoData MD;
-    String mTitle,mText;
+    String mTitle,mText, time, deadLine;
 
     MainActivity mainActivity;
-    Button saveButton;
+    Button saveButton, TimeSettingPageBackButton, selectDate;
     SimpleDateFormat mFormat;
-    String time;
-    Button TimeSettingPageBackButton;
 
     RelativeLayout settingLayout;
 
-    Button selectDate;
     TextView textView1;
-    String deadLine;
-
 
     FragmentTransaction fragmentTransaction;
 
-
-    int interval;
+    int interval, hour, min;
 
     final String notChanged = "There's no Deadline.. (Click above button)";
     final String emptyTitle = "";
@@ -64,19 +59,14 @@ public class MemoTimeSettingFragment extends Fragment implements MainActivity.on
 
     public static final int REQUEST_CODE = 11;
 
-    NumberPicker np1;
+    NumberPicker np1, np2, np3;
     final String[] values = {"하루 2~3회", "하루 1~2회", "주 6~7회", "주 3회 미만"};
     final int[] intervals = {2,4,13,23};
-
 
     private MemoViewModel memoViewModel;
 
     @Inject
     ViewModelProvider.Factory viewModelFactory;
-
-
-
-
 
     @Override
     public void onAttach(Context context) {
@@ -91,7 +81,6 @@ public class MemoTimeSettingFragment extends Fragment implements MainActivity.on
         this.configureViewModel();
 
     }
-
 
     private void configureDagger(){
         AndroidSupportInjection.inject(this);
@@ -136,7 +125,6 @@ public class MemoTimeSettingFragment extends Fragment implements MainActivity.on
         return rootView;
     }
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // if(requestCode == REQUEST_CODE && requestCode == Activity.RESULT_OK){
@@ -165,6 +153,19 @@ public class MemoTimeSettingFragment extends Fragment implements MainActivity.on
         np1.setDisplayedValues(values);
         np1.setValue(0);
 
+        // time
+        np2 = (NumberPicker) rootView.findViewById(R.id.time_np1);
+
+        np2.setMinValue(2);
+        np2.setMaxValue(23);
+        np2.setValue(23);
+
+        // minute
+        np3 = (NumberPicker) rootView.findViewById(R.id.time_np2);
+
+        np3.setMinValue(0);
+        np3.setMaxValue(59);
+        np3.setValue(59);
 
         mFormat=new SimpleDateFormat("yy-MM-dd kk:mm");//날짜 형식 지정
 
@@ -200,17 +201,19 @@ public class MemoTimeSettingFragment extends Fragment implements MainActivity.on
             }
         });
 
+        hour = np2.getValue();
+        min = np3.getValue();
+
         MD.setMinTime(Integer.toString(makeInterval(interval)));
 
         MD.setRandomTime(new RandomTimeMaker().Randomize(
-                deadLine,
-                time,
+                deadLine, hour, min, time,
                 Integer.parseInt(MD.getMinTime())*60));//수면 시작은 시간만
 
         // test time
         //MD.setRandomTime(new RandomTimeMaker().Randomize(deadLine, time, 1));
 
-//         //년도가 너무 커지면 생성되는 랜덤사이즈가 너무 커진다.
+        //년도가 너무 커지면 생성되는 랜덤사이즈가 너무 커진다.
         memoViewModel.insertMemoData(MD);
         fragmentTransaction = MainActivity.mainActivity.getSupportFragmentManager().beginTransaction();
         MainActivity.mainActivity.getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -218,11 +221,7 @@ public class MemoTimeSettingFragment extends Fragment implements MainActivity.on
         fragmentTransaction.commit();
     }
 
-
-
-
     private void hideKeyboard(){
-
         MainActivity.mainActivity.getHideKeyboard().hideKeyboard();
     }
     private void clickHideKeyboard(){

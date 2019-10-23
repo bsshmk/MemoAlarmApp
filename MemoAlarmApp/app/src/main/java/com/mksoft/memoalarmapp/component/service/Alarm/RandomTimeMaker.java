@@ -2,13 +2,14 @@ package com.mksoft.memoalarmapp.component.service.Alarm;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 
 public class RandomTimeMaker {
 
     int[] days = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    public String Randomize(String deadline,
+    public String Randomize(String deadline, int deadLineHour, int deadLineMin,
                                         String startingTime, int min_interval) {
         // 알람이 울리는 연도, 달, 날짜, 시간, 분
         String timeList = new String();
@@ -29,8 +30,6 @@ public class RandomTimeMaker {
         int limit_month = Integer.parseInt(deadline.substring(3,5));
         int limit_day = Integer.parseInt(deadline.substring(6,8));
         int interval;
-
-        int preHour;
 
         while (now_year <= limit_year) {
 
@@ -70,11 +69,14 @@ public class RandomTimeMaker {
                 if (now_month > limit_month) break;
                 else if (now_month == limit_month) {
                     if (now_day > limit_day) break;
+                    else if(now_day == limit_day){
+                        if(hour > deadLineHour - 1) break;
+                        else if(min > deadLineMin) break;
+                    }
                 }
             }
 
             // 알람 금지 시간
-            //
             String str = new String();
             str += String.format("%02d", now_year)  + String.format("%02d", now_month)  + String.format("%02d", now_day)
                     + String.format("%02d", hour)  + String.format("%02d", min);
@@ -84,10 +86,25 @@ public class RandomTimeMaker {
 
         String dday = new String();
 
-        dday += String.format("%02d", limit_year)  + String.format("%02d", limit_month)  + String.format("%02d", limit_day)
+        // 1시간 전에 울려주기
+        dday = String.format("%02d", limit_year)  + String.format("%02d", limit_month)  + String.format("%02d", limit_day)
+                + String.format("%02d", deadLineHour - 1)  + String.format("%02d", deadLineMin);
+
+        timeList = dday + timeList;
+        Log.d("timeString", dday);
+
+        // 해당 시간에 울려주기
+        dday = String.format("%02d", limit_year)  + String.format("%02d", limit_month)  + String.format("%02d", limit_day)
+                + String.format("%02d", deadLineHour)  + String.format("%02d", deadLineMin);
+
+        timeList = dday + timeList;
+        Log.d("timeString", dday);
+
+        dday = String.format("%02d", limit_year)  + String.format("%02d", limit_month)  + String.format("%02d", limit_day)
                 + "23"  + "59";
 
         timeList = dday + timeList;
+        Log.d("timeString", dday);
 
         return timeList;
     }

@@ -17,6 +17,7 @@ import com.mksoft.memoalarmapp.component.activity.MainActivity;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,7 +32,7 @@ enum ButtonsState {
 }
 
 public class SwipeController extends ItemTouchHelper.Callback {
-
+    private boolean mOrderChanged;
     private MemoAdapter mAdapter;
     private MemoReposityDB memoReposityDB;
 
@@ -62,19 +63,24 @@ public class SwipeController extends ItemTouchHelper.Callback {
     }//오른쪽 가능하게 수정
 
 
+
     @Override
     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-        if (viewHolder.getItemViewType() != target.getItemViewType()) {
 
-
-            mAdapter.refreshDB();
-            return false;
-        }//한칸만 올라가는 현상 수정
-
+        mOrderChanged = true;
         mAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
         return true;
     }
 
+    @Override
+    public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
+        super.onSelectedChanged(viewHolder, actionState);
+        if (actionState == ItemTouchHelper.ACTION_STATE_IDLE && mOrderChanged) {
+            //Log.d("dragend","hi1");
+            mAdapter.refreshDB();
+            mOrderChanged = false;
+        }
+    }
 
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {

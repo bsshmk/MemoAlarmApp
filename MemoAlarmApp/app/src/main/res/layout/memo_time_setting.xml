@@ -54,9 +54,33 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:gravity="center"
+            android:orientation="vertical"
             android:padding="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="마감 시간" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <NumberPicker
+                    android:id="@+id/time_np1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:minWidth="50dp"></NumberPicker>
+
+                <NumberPicker
+                    android:id="@+id/time_np2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:minWidth="50dp">`</NumberPicker>
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -65,13 +89,11 @@
 
             <NumberPicker
                 android:id="@+id/np1"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minWidth="100dp"></NumberPicker>
         </LinearLayout>
 
     </LinearLayout>
-
-
 
 </RelativeLayout>
